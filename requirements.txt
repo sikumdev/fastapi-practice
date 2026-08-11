@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+langchain
+langchain-openai
+langchain-core
+python-dotenv
+langsmith
+httpx
+pydantic-settings
