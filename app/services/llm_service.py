@@ -23,6 +23,7 @@ async def get_chat_response(message: str, session_id: str) -> str:
         str: LLM 응답 텍스트 (AIMessage.content)
     """
     # LLM 인스턴스 생성 — Day 8에서 Depends로 싱글턴 패턴으로 개선
+    # 인스턴스를 매번 생성한다는 건 메모리를 더 사용한다는 의미임
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
     # 프롬프트 템플릿 (Day 2 복습 — ChatPromptTemplate + 변수)
