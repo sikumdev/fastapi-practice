@@ -2,17 +2,10 @@
 # app/dependencies.py — LLM 클라이언트 의존성 정의
 # ────────────────────────────────────────────────────────────
 
-# 동시 요청 100개가 들어오면 ChatOpenAI() 인스턴스를 100개 만듭니다. 불필요한 연결 생성, 메모리 낭비, 미묘한 설정 불일치가 생깁니다.
-# 인스턴스를 생성을 매번 한다는건 메모리 비효율이 발생함 
-
 # ① 환경 변수 로드 — 반드시 ChatOpenAI 임포트보다 먼저!
 from dotenv import load_dotenv
-load_dotenv()  
-               
-#?? 싱글턴 패턴??
-#?? dependency_overrides로 목업(모조)??
-#?? 팩토리??
-#?? 캐시?
+load_dotenv()   # .env에서 OPENAI_API_KEY 등 환경변수 로드
+                # 이 줄이 없으면 ChatOpenAI() 초기화 시 401 Unauthorized 에러 발생
 
 # ② 싱글턴 패턴을 위한 표준 라이브러리 데코레이터
 from functools import lru_cache   # 함수 결과를 캐시 → 같은 인수면 재계산 없이 반환
@@ -20,20 +13,20 @@ from functools import lru_cache   # 함수 결과를 캐시 → 같은 인수면
 # ③ LangChain OpenAI 연동 클라이언트
 from langchain_openai import ChatOpenAI   # OPENAI_API_KEY 환경변수에서 자동 로드
 
-from langchain_core.runnables import Runnable
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-
 
 @lru_cache()       # ← 이 데코레이터가 싱글턴을 만듭니다
-def get_chain() -> Runnable[dict, str]:
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0,)
-    prompt =  ChatPromptTemplate.from_messages([
-                                                ("system", "유용한 AI 어시스턴트입니다."), 
-                                                ("human", "{message}"), ])
-    parser = StrOutputParser()
-    return prompt|llm|parser
+def get_llm() -> ChatOpenAI:
+    """LLM 클라이언트 팩토리 — 최초 1회 생성, 이후 캐시 반환.
 
+    @lru_cache() 없이: 요청마다 ChatOpenAI() 생성 → 연결 낭비
+    @lru_cache() 있으면: 최초 1회만 생성, 모든 요청이 같은 인스턴스 공유
+    """
+    return ChatOpenAI(
+        model="gpt-4o-mini",   # 과정 표준 모델 — 빠른 응답, 저비용
+        temperature=0,          # 일관된 출력 (기본값 0.7보다 낮춰 재현성 확보)
+        # ✅ api_key는 환경변수(OPENAI_API_KEY)에서 자동 로드
+        # ❌ 절대 금지: ChatOpenAI(api_key="sk-...")  ← 코드에 키 노출
+    )
 
 '''
 MODEL_NAME = "gpt-4o-mini"

@@ -22,13 +22,7 @@ app = FastAPI(
     description="MCP 기반 Agentic AI 서비스 개발자 과정 미니프로젝트",  # /docs 설명
     version="0.1.0",                              # /docs 버전 표시
 )
-'''
-실제 배포 환경은 /docs를 제거 하고 배포함
-# 프로덕션: docs_url=None, redoc_url=None
-app = FastAPI(docs_url=None, redoc_url=None)
-# 개발: 기본값(docs_url="/docs") 그대로 사용
 
-'''
 
 # ② 전역 예외 핸들러 — Exception을 잡으면 모든 예상치 못한 에러를 처리
 # ※ @app.exception_handler는 include_router() 전후 어디에 놓아도 동일하게 동작합니다
@@ -48,15 +42,6 @@ async def global_exception_handler(request: Request, exc: Exception):
         # ✅ 사용자에게는 안전한 메시지, 로그에만 상세 기록
     )
 
-'''
-💡 핵심: @app.exception_handler(Exception)은 모든 예외를 한 곳에서 잡는 그물입니다.
-예외가 발생하면 이 핸들러가 항상 {"detail": "서버 오류..."} 형식을 반환하므로
-클라이언트는 항상 같은 형식의 에러 응답을 기대할 수 있습니다.
-단 너무 넓게 잡으면(모든 Exception) 404·422처럼 정상적인 에러도 잡힐 수 있습니다 —
-HTTPException은 별도로 처리하거나 핸들러 안에서 유형을 분기
-'''
-
-
 
 # include_router: "이 라우터를 앱에 연결해라" — 부서를 안내 데스크에 등록하는 것
 app.include_router(health.router)
@@ -66,8 +51,8 @@ app.include_router(health.router)
 app.include_router(chat.router, prefix="/chat", tags=["Chat"])
 # prefix="/chat" → chat.py 안의:
 #   @router.post("/")       → 실제 등록 URL: POST /chat/
-#   @router.post("/stream") → 실제 등록 URL: POST /chat/stream  (Day 9에서 추가)
+#   @router.post("/stream") → 실제 등록 URL: POST /chat/stream  
 # tags=["Chat"] → /docs에서 Chat 그룹으로 묶임
 
-app.include_router(items.router, tags=["Items"])
+app.include_router(items.router, tags=["Items Practice"])
 

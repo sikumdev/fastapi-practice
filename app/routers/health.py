@@ -24,7 +24,6 @@ async def health_check():
     # 예상 응답: {"status": "ok", "service": "lgcns-ai-service"}
 
 
-#====
 '''
 await 쓸 게 있으면 async def, 없으면 그냥 def, 근데 I/O 자체가 없으면 async def
 
@@ -33,7 +32,5 @@ await 쓸 게 있으면 async def, 없으면 그냥 def, 근데 I/O 자체가 �
 I/O 없음                        (dict 리턴, 계산)	        async def
 await 붙는 라이브러리               (httpx, asyncpg)	    async def
 await 안 붙는 라이브러리           (requests, psycopg2)	     def
-async def + 블로킹 코드	절대 금지 ☠️
-
-
+async def + 블로킹 코드	절대 금지
 '''
